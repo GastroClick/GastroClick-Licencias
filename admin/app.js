@@ -629,7 +629,9 @@ function renderizarClientes(
                 );
 
 
+            // ======================================
             // ID
+            // ======================================
 
             const celdaId =
                 document.createElement(
@@ -643,7 +645,9 @@ function renderizarClientes(
                 cliente.id;
 
 
+            // ======================================
             // ESTADO
+            // ======================================
 
             const celdaEstado =
                 document.createElement(
@@ -676,7 +680,9 @@ function renderizarClientes(
             );
 
 
+            // ======================================
             // VENCIMIENTO
+            // ======================================
 
             const celdaVencimiento =
                 document.createElement(
@@ -690,7 +696,9 @@ function renderizarClientes(
                 );
 
 
+            // ======================================
             // SITUACIÓN
+            // ======================================
 
             const celdaSituacion =
                 document.createElement(
@@ -724,7 +732,9 @@ function renderizarClientes(
             );
 
 
+            // ======================================
             // ACCIONES
+            // ======================================
 
             const celdaAcciones =
                 document.createElement(
@@ -1021,6 +1031,106 @@ function formatearFecha(
 
 
 // ==================================================
+// GENERADOR DE ID
+// ==================================================
+
+function generarIdCliente() {
+
+    const caracteres =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+
+    function generarBloque() {
+
+        const valores =
+            new Uint32Array(4);
+
+
+        crypto.getRandomValues(
+            valores
+        );
+
+
+        let resultado = "";
+
+
+        for (
+            let i = 0;
+            i < 4;
+            i++
+        ) {
+
+            resultado +=
+                caracteres[
+                    valores[i] %
+                    caracteres.length
+                ];
+
+        }
+
+
+        return resultado;
+
+    }
+
+
+    return (
+        "GC-" +
+        generarBloque() +
+        "-" +
+        generarBloque() +
+        "-" +
+        generarBloque()
+    );
+
+}
+
+
+// ==================================================
+// GENERAR ID ÚNICO
+// ==================================================
+
+function generarIdClienteUnico() {
+
+    let intentos = 0;
+
+
+    while (
+        intentos < 100
+    ) {
+
+        const nuevoId =
+            generarIdCliente();
+
+
+        const existe =
+            clientes.some(
+                cliente =>
+                    cliente.id ===
+                    nuevoId
+            );
+
+
+        if (!existe) {
+
+            return nuevoId;
+
+        }
+
+
+        intentos++;
+
+    }
+
+
+    throw new Error(
+        "No se pudo generar un ID único."
+    );
+
+}
+
+
+// ==================================================
 // NUEVO CLIENTE
 // ==================================================
 
@@ -1054,12 +1164,50 @@ function abrirModalNuevoCliente() {
         );
 
 
+    // ----------------------------------------------
+    // GENERAR ID AUTOMÁTICAMENTE
+    // ----------------------------------------------
+
+    let nuevoId;
+
+
+    try {
+
+        nuevoId =
+            generarIdClienteUnico();
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        mostrarToast(
+            "No se pudo generar el ID del cliente."
+        );
+
+
+        return;
+
+    }
+
+
     if (id) {
 
-        id.value = "";
+        id.value =
+            nuevoId;
+
+        // El usuario NO puede modificarlo.
 
         id.disabled =
-            false;
+            true;
+
+        // Evita que el navegador lo marque
+        // como editable visualmente.
+
+        id.readOnly =
+            true;
 
     }
 
@@ -1144,7 +1292,12 @@ function abrirModalEditarCliente(
     inputId.value =
         cliente.id;
 
+
     inputId.disabled =
+        true;
+
+
+    inputId.readOnly =
         true;
 
 
@@ -1190,7 +1343,7 @@ async function guardarCliente() {
     if (!id) {
 
         mostrarToast(
-            "Ingresá un ID referencial."
+            "No se pudo generar el ID del cliente."
         );
 
         return;
@@ -1209,6 +1362,10 @@ async function guardarCliente() {
     }
 
 
+    // ==========================================
+    // COMPROBAR ID DUPLICADO
+    // ==========================================
+
     const existe =
         clientes.some(
             cliente =>
@@ -1224,9 +1381,30 @@ async function guardarCliente() {
         !clienteEditando
     ) {
 
+        /*
+         * Es extremadamente improbable porque
+         * usamos crypto.getRandomValues(),
+         * pero si ocurre generamos otro ID.
+         */
+
+        const nuevoId =
+            generarIdClienteUnico();
+
+
+        const inputId =
+            document.getElementById(
+                "clienteId"
+            );
+
+
+        inputId.value =
+            nuevoId;
+
+
         mostrarToast(
-            "Ese ID ya existe."
+            "Se generó un nuevo ID automáticamente."
         );
+
 
         return;
 
@@ -1693,15 +1871,18 @@ function mostrarErrorCarga() {
         "—"
     );
 
+
     establecerTexto(
         "clientesActivos",
         "—"
     );
 
+
     establecerTexto(
         "clientesSuspendidos",
         "—"
     );
+
 
     establecerTexto(
         "clientesVencidos",
