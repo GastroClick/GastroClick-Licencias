@@ -41,7 +41,98 @@ document.addEventListener(
 // ==================================================
 // EVENTOS
 // ==================================================
+// ==================================================
+// GENERADOR DE ID
+// ==================================================
 
+function generarIdCliente() {
+
+    const caracteres =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+
+    function generarBloque() {
+
+        const valores =
+            new Uint32Array(4);
+
+        crypto.getRandomValues(
+            valores
+        );
+
+        let resultado = "";
+
+        for (
+            let i = 0;
+            i < 4;
+            i++
+        ) {
+
+            resultado +=
+                caracteres[
+                    valores[i] %
+                    caracteres.length
+                ];
+
+        }
+
+        return resultado;
+
+    }
+
+
+    return (
+        "GC-" +
+        generarBloque() +
+        "-" +
+        generarBloque() +
+        "-" +
+        generarBloque()
+    );
+
+}
+
+
+// ==================================================
+// GENERAR ID ÚNICO
+// ==================================================
+
+function generarIdClienteUnico() {
+
+    let intentos = 0;
+
+    while (
+        intentos < 100
+    ) {
+
+        const nuevoId =
+            generarIdCliente();
+
+
+        const existe =
+            clientes.some(
+                cliente =>
+                    cliente.id === nuevoId
+            );
+
+
+        if (!existe) {
+
+            return nuevoId;
+
+        }
+
+
+        intentos++;
+
+    }
+
+
+    throw new Error(
+        "No se pudo generar un ID único."
+    );
+
+}
 function inicializarEventos() {
 
     document
@@ -1164,12 +1255,11 @@ function abrirModalNuevoCliente() {
         );
 
 
-    // ----------------------------------------------
+    // ==============================================
     // GENERAR ID AUTOMÁTICAMENTE
-    // ----------------------------------------------
+    // ==============================================
 
     let nuevoId;
-
 
     try {
 
@@ -1182,11 +1272,9 @@ function abrirModalNuevoCliente() {
             error
         );
 
-
         mostrarToast(
             "No se pudo generar el ID del cliente."
         );
-
 
         return;
 
@@ -1198,13 +1286,8 @@ function abrirModalNuevoCliente() {
         id.value =
             nuevoId;
 
-        // El usuario NO puede modificarlo.
-
         id.disabled =
             true;
-
-        // Evita que el navegador lo marque
-        // como editable visualmente.
 
         id.readOnly =
             true;
