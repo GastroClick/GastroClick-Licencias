@@ -2,8 +2,8 @@
   "clientes": [
     {
       "id": "CARMELA001",
-      "estado": "SUSPENDIDA",
-      "vencimiento": "2026-12-31"
+      "estado": "ACTIVA",
+      "vencimiento": "2026-08-12"
     },
     {
       "id": "GC-8F29-KD71-XP44",
