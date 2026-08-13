@@ -1,1 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>GastroClick - Administración</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+</head>
+
+<body>
+
+    <!-- ==================================================
+         BARRA LATERAL
+         ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            GastroClick
+        </div>
+
+        <div class="logo-subtitle">
+            Administración
+        </div>
+
+        <nav class="menu">
+
+            <button class="menu-item active"
+                    type="button">
+
+                <span class="menu-icon">▣</span>
+
+                <span>
+                    Clientes
+                </span>
+
+            </button>
+
+            <button class="menu-item"
+                    type="button">
+
+                <span class="menu-icon">⚙</span>
+
+                <span>
+                    Configuración
+                </span>
+
+            </button>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            Sistema de licencias
+
+            <br>
+
+            <span>
+                GastroClick
+            </span>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================================================
+         CONTENIDO PRINCIPAL
+         ================================================== -->
+
+    <main class="main-content">
+
+        <!-- ENCABEZADO -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Clientes
+                </h1>
+
+                <p>
+                    Administración de licencias GastroClick
+                </p>
+
+            </div>
+
+            <div class="connection-status">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    Conectado
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- ==================================================
+             ESTADÍSTICAS
+             ================================================== -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total clientes
+                </div>
+
+                <div class="stat-value"
+                     id="totalClientes">
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Activos
+                </div>
+
+                <div class="stat-value active-value"
+                     id="clientesActivos">
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Suspendidos
+                </div>
+
+                <div class="stat-value suspended-value"
+                     id="clientesSuspendidos">
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Vencidos
+                </div>
+
+                <div class="stat-value expired-value"
+                     id="clientesVencidos">
+                    0
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             PANEL DE CLIENTES
+             ================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Licencias
+                    </h2>
+
+                    <p>
+                        Clientes registrados en GastroClick
+                    </p>
+
+                </div>
+
+
+                <button class="btn-primary"
+                        id="btnNuevoCliente"
+                        type="button">
+
+                    <span>
+                        +
+                    </span>
+
+                    Nuevo cliente
+
+                </button>
+
+            </div>
+
+
+            <!-- ==================================================
+                 HERRAMIENTAS
+                 ================================================== -->
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span class="search-icon">
+                        ⌕
+                    </span>
+
+                    <input
+                        type="text"
+                        id="buscarCliente"
+                        placeholder="Buscar por ID..."
+                        autocomplete="off">
+
+                </div>
+
+
+                <select id="filtroEstado">
+
+                    <option value="TODOS">
+                        Todos los estados
+                    </option>
+
+                    <option value="ACTIVA">
+                        Activas
+                    </option>
+
+                    <option value="SUSPENDIDA">
+                        Suspendidas
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 TABLA
+                 ================================================== -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Estado
+                            </th>
+
+                            <th>
+                                Vencimiento
+                            </th>
+
+                            <th>
+                                Situación
+                            </th>
+
+                            <th>
+                                Acciones
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tablaClientes">
+
+                        <!--
+
+                        Los clientes serán cargados
+                        dinámicamente desde clientes.json.
+
+                        Ejemplo:
+
+                        <tr>
+
+                            <td>
+                                CARMELA001
+                            </td>
+
+                            <td>
+                                <span class="badge active">
+                                    ACTIVA
+                                </span>
+                            </td>
+
+                            <td>
+                                31/12/2026
+                            </td>
+
+                            <td>
+                                Vigente
+                            </td>
+
+                            <td>
+                                Editar
+                            </td>
+
+                        </tr>
+
+                        -->
+
+                        <tr class="empty-row">
+
+                            <td colspan="5">
+
+                                No hay clientes cargados.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==================================================
+         MODAL NUEVO / EDITAR CLIENTE
+         ================================================== -->
+
+    <div class="modal-overlay"
+         id="modalCliente"
+         hidden>
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h2 id="modalTitulo">
+                        Nuevo cliente
+                    </h2>
+
+                    <p>
+                        Configuración de licencia
+                    </p>
+
+                </div>
+
+                <button
+                    class="modal-close"
+                    id="btnCerrarModal"
+                    type="button">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <!-- ID -->
+
+                <div class="form-group">
+
+                    <label for="clienteId">
+                        ID referencial
+                    </label>
+
+                    <input
+                        type="text"
+                        id="clienteId"
+                        maxlength="50"
+                        placeholder="Ej. CARMELA001"
+                        autocomplete="off">
+
+                    <small>
+                        Identificador utilizado por GastroClick
+                        para validar esta instalación.
+                    </small>
+
+                </div>
+
+
+                <!-- ESTADO -->
+
+                <div class="form-group">
+
+                    <label for="clienteEstado">
+                        Estado
+                    </label>
+
+                    <select id="clienteEstado">
+
+                        <option value="ACTIVA">
+                            ACTIVA
+                        </option>
+
+                        <option value="SUSPENDIDA">
+                            SUSPENDIDA
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- VENCIMIENTO -->
+
+                <div class="form-group">
+
+                    <label for="clienteVencimiento">
+                        Vencimiento
+                    </label>
+
+                    <input
+                        type="date"
+                        id="clienteVencimiento">
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    id="btnCancelar"
+                    type="button">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    class="btn-primary"
+                    id="btnGuardarCliente"
+                    type="button">
+
+                    Guardar cliente
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         MODAL CONFIRMACIÓN DE ELIMINACIÓN
+         ================================================== -->
+
+    <div class="modal-overlay"
+         id="modalEliminar"
+         hidden>
+
+        <div class="modal modal-small">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h2>
+                        Eliminar cliente
+                    </h2>
+
+                </div>
+
+                <button
+                    class="modal-close"
+                    id="btnCerrarEliminar"
+                    type="button">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <p>
+                    ¿Estás seguro de que querés eliminar
+                    esta licencia?
+                </p>
+
+                <p class="delete-client-id"
+                   id="clienteEliminarId">
+                </p>
+
+                <p class="warning-text">
+                    Esta acción eliminará el cliente de
+                    <strong>clientes.json</strong>.
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    id="btnCancelarEliminar"
+                    type="button">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    class="btn-danger"
+                    id="btnConfirmarEliminar"
+                    type="button">
+
+                    Eliminar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         NOTIFICACIÓN
+         ================================================== -->
+
+    <div class="toast"
+         id="toast"
+         hidden>
+
+        <span id="toastMensaje">
+            Operación realizada correctamente.
+        </span>
+
+    </div>
+
+
+    <!-- ==================================================
+         JAVASCRIPT
+         ================================================== -->
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
