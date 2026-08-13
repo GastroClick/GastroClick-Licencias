@@ -1,17 +1,14 @@
-// ==================================================
-// GASTROCLICK
-// PANEL DE ADMINISTRACIÓN
-// ==================================================
-
 "use strict";
-
 
 // ==================================================
 // CONFIGURACIÓN
 // ==================================================
 
-const URL_CLIENTES =
-    "../clientes/clientes.json";
+const API_URL =
+    "https://gastroclick-licencias-api.adm-gastroclick.workers.dev";
+
+const STORAGE_KEY =
+    "gastroclick_admin_key";
 
 
 // ==================================================
@@ -29,13 +26,16 @@ let clienteEliminar = null;
 // INICIO
 // ==================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    inicializarEventos();
+        inicializarEventos();
 
-    cargarClientes();
+        cargarClientes();
 
-});
+    }
+);
 
 
 // ==================================================
@@ -44,169 +44,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function inicializarEventos() {
 
-    // ----------------------------------------------
-    // NUEVO CLIENTE
-    // ----------------------------------------------
-
-    const btnNuevoCliente =
-        document.getElementById("btnNuevoCliente");
-
-    if (btnNuevoCliente) {
-
-        btnNuevoCliente.addEventListener(
+    document
+        .getElementById("btnNuevoCliente")
+        ?.addEventListener(
             "click",
             abrirModalNuevoCliente
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // CERRAR MODAL
-    // ----------------------------------------------
-
-    const btnCerrarModal =
-        document.getElementById("btnCerrarModal");
-
-    if (btnCerrarModal) {
-
-        btnCerrarModal.addEventListener(
+    document
+        .getElementById("btnCerrarModal")
+        ?.addEventListener(
             "click",
             cerrarModalCliente
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // CANCELAR
-    // ----------------------------------------------
-
-    const btnCancelar =
-        document.getElementById("btnCancelar");
-
-    if (btnCancelar) {
-
-        btnCancelar.addEventListener(
+    document
+        .getElementById("btnCancelar")
+        ?.addEventListener(
             "click",
             cerrarModalCliente
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // GUARDAR
-    // ----------------------------------------------
-
-    const btnGuardarCliente =
-        document.getElementById("btnGuardarCliente");
-
-    if (btnGuardarCliente) {
-
-        btnGuardarCliente.addEventListener(
+    document
+        .getElementById("btnGuardarCliente")
+        ?.addEventListener(
             "click",
             guardarCliente
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // BUSCAR
-    // ----------------------------------------------
-
-    const buscarCliente =
-        document.getElementById("buscarCliente");
-
-    if (buscarCliente) {
-
-        buscarCliente.addEventListener(
+    document
+        .getElementById("buscarCliente")
+        ?.addEventListener(
             "input",
             aplicarFiltros
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // FILTRO ESTADO
-    // ----------------------------------------------
-
-    const filtroEstado =
-        document.getElementById("filtroEstado");
-
-    if (filtroEstado) {
-
-        filtroEstado.addEventListener(
+    document
+        .getElementById("filtroEstado")
+        ?.addEventListener(
             "change",
             aplicarFiltros
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // CERRAR MODAL ELIMINAR
-    // ----------------------------------------------
-
-    const btnCerrarEliminar =
-        document.getElementById("btnCerrarEliminar");
-
-    if (btnCerrarEliminar) {
-
-        btnCerrarEliminar.addEventListener(
+    document
+        .getElementById("btnCerrarEliminar")
+        ?.addEventListener(
             "click",
             cerrarModalEliminar
         );
 
-    }
 
-
-    const btnCancelarEliminar =
-        document.getElementById("btnCancelarEliminar");
-
-    if (btnCancelarEliminar) {
-
-        btnCancelarEliminar.addEventListener(
+    document
+        .getElementById("btnCancelarEliminar")
+        ?.addEventListener(
             "click",
             cerrarModalEliminar
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // CONFIRMAR ELIMINACIÓN
-    // ----------------------------------------------
-
-    const btnConfirmarEliminar =
-        document.getElementById("btnConfirmarEliminar");
-
-    if (btnConfirmarEliminar) {
-
-        btnConfirmarEliminar.addEventListener(
+    document
+        .getElementById("btnConfirmarEliminar")
+        ?.addEventListener(
             "click",
             confirmarEliminar
         );
 
-    }
 
-
-    // ----------------------------------------------
-    // CERRAR MODALES HACIENDO CLICK AFUERA
-    // ----------------------------------------------
-
-    const modalCliente =
-        document.getElementById("modalCliente");
-
-    if (modalCliente) {
-
-        modalCliente.addEventListener(
+    document
+        .getElementById("modalCliente")
+        ?.addEventListener(
             "click",
-            (event) => {
+            event => {
 
-                if (event.target === modalCliente) {
+                if (
+                    event.target.id ===
+                    "modalCliente"
+                ) {
 
                     cerrarModalCliente();
 
@@ -215,19 +134,17 @@ function inicializarEventos() {
             }
         );
 
-    }
 
-
-    const modalEliminar =
-        document.getElementById("modalEliminar");
-
-    if (modalEliminar) {
-
-        modalEliminar.addEventListener(
+    document
+        .getElementById("modalEliminar")
+        ?.addEventListener(
             "click",
-            (event) => {
+            event => {
 
-                if (event.target === modalEliminar) {
+                if (
+                    event.target.id ===
+                    "modalEliminar"
+                ) {
 
                     cerrarModalEliminar();
 
@@ -236,7 +153,121 @@ function inicializarEventos() {
             }
         );
 
+}
+
+
+// ==================================================
+// OBTENER ADMIN KEY
+// ==================================================
+
+function obtenerAdminKey() {
+
+    let key =
+        sessionStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (key) {
+
+        return key;
+
     }
+
+
+    key =
+        window.prompt(
+            "Ingrese la clave de administración:"
+        );
+
+
+    if (
+        !key ||
+        !key.trim()
+    ) {
+
+        return null;
+
+    }
+
+
+    key =
+        key.trim();
+
+
+    sessionStorage.setItem(
+        STORAGE_KEY,
+        key
+    );
+
+
+    return key;
+
+}
+
+
+// ==================================================
+// PETICIÓN AUTORIZADA
+// ==================================================
+
+async function peticionAutorizada(
+    url,
+    opciones = {}
+) {
+
+    const adminKey =
+        obtenerAdminKey();
+
+
+    if (!adminKey) {
+
+        throw new Error(
+            "ADMIN_KEY_REQUIRED"
+        );
+
+    }
+
+
+    const headers = {
+
+        ...(opciones.headers || {}),
+
+        "Authorization":
+            "Bearer " + adminKey,
+
+        "Content-Type":
+            "application/json"
+
+    };
+
+
+    const respuesta =
+        await fetch(
+            url,
+            {
+                ...opciones,
+                headers
+            }
+        );
+
+
+    if (
+        respuesta.status === 401
+    ) {
+
+        sessionStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        throw new Error(
+            "ADMIN_KEY_INVALID"
+        );
+
+    }
+
+
+    return respuesta;
 
 }
 
@@ -251,7 +282,9 @@ async function cargarClientes() {
 
         const respuesta =
             await fetch(
-                URL_CLIENTES + "?t=" + Date.now(),
+                API_URL +
+                "/clientes?t=" +
+                Date.now(),
                 {
                     cache: "no-store"
                 }
@@ -261,7 +294,8 @@ async function cargarClientes() {
         if (!respuesta.ok) {
 
             throw new Error(
-                "HTTP " + respuesta.status
+                "HTTP " +
+                respuesta.status
             );
 
         }
@@ -271,46 +305,43 @@ async function cargarClientes() {
             await respuesta.json();
 
 
-        // ------------------------------------------
-        // VALIDAR ESTRUCTURA
-        // ------------------------------------------
-
-        if (!datos ||
-            !Array.isArray(datos.clientes)) {
+        if (
+            !datos ||
+            !Array.isArray(
+                datos.clientes
+            )
+        ) {
 
             throw new Error(
-                "El archivo clientes.json no tiene "
-                + "la estructura esperada."
+                "Respuesta inválida."
             );
 
         }
 
 
         clientes =
-            datos.clientes;
+            datos.clientes.map(
+                cliente => ({
 
+                    id:
+                        String(
+                            cliente.id || ""
+                        ).trim(),
 
-        // ------------------------------------------
-        // NORMALIZAR DATOS
-        // ------------------------------------------
+                    estado:
+                        String(
+                            cliente.estado || ""
+                        )
+                        .trim()
+                        .toUpperCase(),
 
-        clientes =
-            clientes.map(cliente => ({
+                    vencimiento:
+                        String(
+                            cliente.vencimiento || ""
+                        ).trim()
 
-                id:
-                    String(cliente.id || "").trim(),
-
-                estado:
-                    String(
-                        cliente.estado || ""
-                    ).trim().toUpperCase(),
-
-                vencimiento:
-                    String(
-                        cliente.vencimiento || ""
-                    ).trim()
-
-            }));
+                })
+            );
 
 
         actualizarDashboard();
@@ -318,15 +349,95 @@ async function cargarClientes() {
         aplicarFiltros();
 
 
+        establecerConexion(
+            true
+        );
+
+
     } catch (error) {
 
         console.error(
-            "Error cargando clientes:",
+            "Error:",
             error
         );
 
 
+        establecerConexion(
+            false
+        );
+
+
         mostrarErrorCarga();
+
+    }
+
+}
+
+
+// ==================================================
+// INDICADOR CONEXIÓN
+// ==================================================
+
+function establecerConexion(
+    conectado
+) {
+
+    const elemento =
+        document.querySelector(
+            ".connection-status"
+        );
+
+
+    if (!elemento) {
+
+        return;
+
+    }
+
+
+    const punto =
+        elemento.querySelector(
+            ".status-dot"
+        );
+
+
+    const texto =
+        elemento.querySelector(
+            "span:last-child"
+        );
+
+
+    if (conectado) {
+
+        if (punto) {
+
+            punto.style.background =
+                "#16a34a";
+
+        }
+
+        if (texto) {
+
+            texto.textContent =
+                "Conectado";
+
+        }
+
+    } else {
+
+        if (punto) {
+
+            punto.style.background =
+                "#dc2626";
+
+        }
+
+        if (texto) {
+
+            texto.textContent =
+                "Sin conexión";
+
+        }
 
     }
 
@@ -339,38 +450,34 @@ async function cargarClientes() {
 
 function actualizarDashboard() {
 
-    const hoy =
-        new Date();
-
-
-    const total =
-        clientes.length;
-
-
     const activos =
         clientes.filter(
             cliente =>
-                cliente.estado === "ACTIVA"
+                cliente.estado ===
+                "ACTIVA"
         ).length;
 
 
     const suspendidos =
         clientes.filter(
             cliente =>
-                cliente.estado === "SUSPENDIDA"
+                cliente.estado ===
+                "SUSPENDIDA"
         ).length;
 
 
     const vencidos =
         clientes.filter(
             cliente =>
-                estaVencido(cliente.vencimiento)
+                estaVencido(
+                    cliente.vencimiento
+                )
         ).length;
 
 
     establecerTexto(
         "totalClientes",
-        total
+        clientes.length
     );
 
 
@@ -400,62 +507,49 @@ function actualizarDashboard() {
 
 function aplicarFiltros() {
 
-    const input =
-        document.getElementById(
-            "buscarCliente"
-        );
-
-
-    const select =
-        document.getElementById(
-            "filtroEstado"
-        );
-
-
     const texto =
-        input
-            ? input.value
-                .trim()
-                .toLowerCase()
-            : "";
+        (
+            document.getElementById(
+                "buscarCliente"
+            )?.value || ""
+        )
+        .trim()
+        .toLowerCase();
 
 
     const estado =
-        select
-            ? select.value
-            : "TODOS";
+        document.getElementById(
+            "filtroEstado"
+        )?.value ||
+        "TODOS";
 
 
     const filtrados =
-        clientes.filter(cliente => {
+        clientes.filter(
+            cliente => {
 
-            // --------------------------------------
-            // BUSQUEDA POR ID
-            // --------------------------------------
-
-            const coincideBusqueda =
-                cliente.id
-                    .toLowerCase()
-                    .includes(texto);
-
-
-            // --------------------------------------
-            // FILTRO ESTADO
-            // --------------------------------------
-
-            const coincideEstado =
-                estado === "TODOS"
-                ||
-                cliente.estado === estado;
+                const coincideTexto =
+                    cliente.id
+                        .toLowerCase()
+                        .includes(
+                            texto
+                        );
 
 
-            return (
-                coincideBusqueda
-                &&
-                coincideEstado
-            );
+                const coincideEstado =
+                    estado === "TODOS"
+                    ||
+                    cliente.estado ===
+                    estado;
 
-        });
+
+                return (
+                    coincideTexto &&
+                    coincideEstado
+                );
+
+            }
+        );
 
 
     renderizarClientes(
@@ -480,24 +574,32 @@ function renderizarClientes(
 
 
     if (!tabla) {
+
         return;
+
     }
 
 
     tabla.innerHTML = "";
 
 
-    if (lista.length === 0) {
+    if (
+        lista.length === 0
+    ) {
 
         const fila =
-            document.createElement("tr");
+            document.createElement(
+                "tr"
+            );
 
         fila.className =
             "empty-row";
 
 
         const celda =
-            document.createElement("td");
+            document.createElement(
+                "td"
+            );
 
         celda.colSpan = 5;
 
@@ -505,227 +607,232 @@ function renderizarClientes(
             "No se encontraron clientes.";
 
 
-        fila.appendChild(celda);
-
-        tabla.appendChild(fila);
-
-        return;
-    }
-
-
-    lista.forEach(cliente => {
-
-        const fila =
-            document.createElement("tr");
-
-
-        // ------------------------------------------
-        // ID
-        // ------------------------------------------
-
-        const celdaId =
-            document.createElement("td");
-
-        celdaId.className =
-            "client-id";
-
-        celdaId.textContent =
-            cliente.id;
-
-
-        // ------------------------------------------
-        // ESTADO
-        // ------------------------------------------
-
-        const celdaEstado =
-            document.createElement("td");
-
-
-        const badge =
-            document.createElement("span");
-
-
-        badge.className =
-            "badge "
-            +
-            (
-                cliente.estado === "ACTIVA"
-                    ? "active"
-                    : "suspended"
-            );
-
-
-        badge.textContent =
-            cliente.estado;
-
-
-        celdaEstado.appendChild(
-            badge
-        );
-
-
-        // ------------------------------------------
-        // VENCIMIENTO
-        // ------------------------------------------
-
-        const celdaVencimiento =
-            document.createElement("td");
-
-
-        celdaVencimiento.textContent =
-            formatearFecha(
-                cliente.vencimiento
-            );
-
-
-        // ------------------------------------------
-        // SITUACIÓN
-        // ------------------------------------------
-
-        const celdaSituacion =
-            document.createElement("td");
-
-
-        const situacion =
-            obtenerSituacion(
-                cliente
-            );
-
-
-        const situacionSpan =
-            document.createElement("span");
-
-
-        situacionSpan.className =
-            "situation "
-            +
-            situacion.clase;
-
-
-        situacionSpan.textContent =
-            situacion.texto;
-
-
-        celdaSituacion.appendChild(
-            situacionSpan
-        );
-
-
-        // ------------------------------------------
-        // ACCIONES
-        // ------------------------------------------
-
-        const celdaAcciones =
-            document.createElement("td");
-
-
-        const acciones =
-            document.createElement("div");
-
-
-        acciones.className =
-            "table-actions";
-
-
-        // EDITAR
-
-        const btnEditar =
-            document.createElement("button");
-
-
-        btnEditar.type =
-            "button";
-
-
-        btnEditar.className =
-            "action-btn";
-
-
-        btnEditar.textContent =
-            "Editar";
-
-
-        btnEditar.addEventListener(
-            "click",
-            () =>
-                abrirModalEditarCliente(
-                    cliente.id
-                )
-        );
-
-
-        // ELIMINAR
-
-        const btnEliminar =
-            document.createElement("button");
-
-
-        btnEliminar.type =
-            "button";
-
-
-        btnEliminar.className =
-            "action-btn delete";
-
-
-        btnEliminar.textContent =
-            "Eliminar";
-
-
-        btnEliminar.addEventListener(
-            "click",
-            () =>
-                abrirModalEliminar(
-                    cliente.id
-                )
-        );
-
-
-        acciones.appendChild(
-            btnEditar
-        );
-
-
-        acciones.appendChild(
-            btnEliminar
-        );
-
-
-        celdaAcciones.appendChild(
-            acciones
-        );
-
-
-        // ------------------------------------------
-        // ARMAR FILA
-        // ------------------------------------------
-
         fila.appendChild(
-            celdaId
+            celda
         );
-
-        fila.appendChild(
-            celdaEstado
-        );
-
-        fila.appendChild(
-            celdaVencimiento
-        );
-
-        fila.appendChild(
-            celdaSituacion
-        );
-
-        fila.appendChild(
-            celdaAcciones
-        );
-
 
         tabla.appendChild(
             fila
         );
 
-    });
+        return;
+
+    }
+
+
+    lista.forEach(
+        cliente => {
+
+            const fila =
+                document.createElement(
+                    "tr"
+                );
+
+
+            // ID
+
+            const celdaId =
+                document.createElement(
+                    "td"
+                );
+
+            celdaId.className =
+                "client-id";
+
+            celdaId.textContent =
+                cliente.id;
+
+
+            // ESTADO
+
+            const celdaEstado =
+                document.createElement(
+                    "td"
+                );
+
+
+            const badge =
+                document.createElement(
+                    "span"
+                );
+
+
+            badge.className =
+                "badge " +
+                (
+                    cliente.estado ===
+                    "ACTIVA"
+                        ? "active"
+                        : "suspended"
+                );
+
+
+            badge.textContent =
+                cliente.estado;
+
+
+            celdaEstado.appendChild(
+                badge
+            );
+
+
+            // VENCIMIENTO
+
+            const celdaVencimiento =
+                document.createElement(
+                    "td"
+                );
+
+
+            celdaVencimiento.textContent =
+                formatearFecha(
+                    cliente.vencimiento
+                );
+
+
+            // SITUACIÓN
+
+            const celdaSituacion =
+                document.createElement(
+                    "td"
+                );
+
+
+            const situacion =
+                obtenerSituacion(
+                    cliente
+                );
+
+
+            const situacionSpan =
+                document.createElement(
+                    "span"
+                );
+
+
+            situacionSpan.className =
+                "situation " +
+                situacion.clase;
+
+
+            situacionSpan.textContent =
+                situacion.texto;
+
+
+            celdaSituacion.appendChild(
+                situacionSpan
+            );
+
+
+            // ACCIONES
+
+            const celdaAcciones =
+                document.createElement(
+                    "td"
+                );
+
+
+            const acciones =
+                document.createElement(
+                    "div"
+                );
+
+
+            acciones.className =
+                "table-actions";
+
+
+            const btnEditar =
+                document.createElement(
+                    "button"
+                );
+
+
+            btnEditar.type =
+                "button";
+
+            btnEditar.className =
+                "action-btn";
+
+            btnEditar.textContent =
+                "Editar";
+
+
+            btnEditar.addEventListener(
+                "click",
+                () =>
+                    abrirModalEditarCliente(
+                        cliente.id
+                    )
+            );
+
+
+            const btnEliminar =
+                document.createElement(
+                    "button"
+                );
+
+
+            btnEliminar.type =
+                "button";
+
+            btnEliminar.className =
+                "action-btn delete";
+
+            btnEliminar.textContent =
+                "Eliminar";
+
+
+            btnEliminar.addEventListener(
+                "click",
+                () =>
+                    abrirModalEliminar(
+                        cliente.id
+                    )
+            );
+
+
+            acciones.appendChild(
+                btnEditar
+            );
+
+            acciones.appendChild(
+                btnEliminar
+            );
+
+
+            celdaAcciones.appendChild(
+                acciones
+            );
+
+
+            fila.appendChild(
+                celdaId
+            );
+
+            fila.appendChild(
+                celdaEstado
+            );
+
+            fila.appendChild(
+                celdaVencimiento
+            );
+
+            fila.appendChild(
+                celdaSituacion
+            );
+
+            fila.appendChild(
+                celdaAcciones
+            );
+
+
+            tabla.appendChild(
+                fila
+            );
+
+        }
+    );
 
 }
 
@@ -739,7 +846,8 @@ function obtenerSituacion(
 ) {
 
     if (
-        cliente.estado !== "ACTIVA"
+        cliente.estado !==
+        "ACTIVA"
     ) {
 
         return {
@@ -795,11 +903,6 @@ function estaVencido(
     fecha
 ) {
 
-    if (!fecha) {
-        return false;
-    }
-
-
     const fechaVencimiento =
         convertirFecha(
             fecha
@@ -807,7 +910,9 @@ function estaVencido(
 
 
     if (!fechaVencimiento) {
+
         return false;
+
     }
 
 
@@ -824,19 +929,27 @@ function estaVencido(
 
 
     return (
-        fechaVencimiento < hoy
+        fechaVencimiento <
+        hoy
     );
 
 }
 
 
 // ==================================================
-// CONVERTIR FECHA
+// FECHA
 // ==================================================
 
 function convertirFecha(
     fecha
 ) {
+
+    if (!fecha) {
+
+        return null;
+
+    }
+
 
     const partes =
         fecha.split("-");
@@ -851,45 +964,11 @@ function convertirFecha(
     }
 
 
-    const anio =
-        parseInt(
-            partes[0],
-            10
-        );
-
-
-    const mes =
-        parseInt(
-            partes[1],
-            10
-        );
-
-
-    const dia =
-        parseInt(
-            partes[2],
-            10
-        );
-
-
-    if (
-        isNaN(anio)
-        ||
-        isNaN(mes)
-        ||
-        isNaN(dia)
-    ) {
-
-        return null;
-
-    }
-
-
     const resultado =
         new Date(
-            anio,
-            mes - 1,
-            dia
+            Number(partes[0]),
+            Number(partes[1]) - 1,
+            Number(partes[2])
         );
 
 
@@ -905,10 +984,6 @@ function convertirFecha(
 
 }
 
-
-// ==================================================
-// FORMATEAR FECHA
-// ==================================================
 
 function formatearFecha(
     fecha
@@ -935,11 +1010,11 @@ function formatearFecha(
 
 
     return (
-        partes[2]
-        + "/"
-        + partes[1]
-        + "/"
-        + partes[0]
+        partes[2] +
+        "/" +
+        partes[1] +
+        "/" +
+        partes[0]
     );
 
 }
@@ -961,7 +1036,7 @@ function abrirModalNuevoCliente() {
     );
 
 
-    const inputId =
+    const id =
         document.getElementById(
             "clienteId"
         );
@@ -979,12 +1054,11 @@ function abrirModalNuevoCliente() {
         );
 
 
-    if (inputId) {
+    if (id) {
 
-        inputId.value =
-            "";
+        id.value = "";
 
-        inputId.disabled =
+        id.disabled =
             false;
 
     }
@@ -1031,7 +1105,7 @@ function abrirModalEditarCliente(
     if (!cliente) {
 
         mostrarToast(
-            "No se encontró el cliente."
+            "Cliente no encontrado."
         );
 
         return;
@@ -1067,36 +1141,19 @@ function abrirModalEditarCliente(
         );
 
 
-    if (inputId) {
+    inputId.value =
+        cliente.id;
 
-        inputId.value =
-            cliente.id;
-
-        /*
-         * El ID no se modifica
-         * después de crear el cliente.
-         */
-
-        inputId.disabled =
-            true;
-
-    }
+    inputId.disabled =
+        true;
 
 
-    if (estado) {
-
-        estado.value =
-            cliente.estado;
-
-    }
+    estado.value =
+        cliente.estado;
 
 
-    if (vencimiento) {
-
-        vencimiento.value =
-            cliente.vencimiento;
-
-    }
+    vencimiento.value =
+        cliente.vencimiento;
 
 
     mostrarModal(
@@ -1107,50 +1164,28 @@ function abrirModalEditarCliente(
 
 
 // ==================================================
-// GUARDAR CLIENTE
+// GUARDAR
 // ==================================================
 
-function guardarCliente() {
+async function guardarCliente() {
 
-    const inputId =
+    const id =
         document.getElementById(
             "clienteId"
-        );
+        )?.value.trim();
 
 
     const estado =
         document.getElementById(
             "clienteEstado"
-        );
+        )?.value;
 
 
     const vencimiento =
         document.getElementById(
             "clienteVencimiento"
-        );
+        )?.value;
 
-
-    const id =
-        inputId
-            ? inputId.value.trim()
-            : "";
-
-
-    const estadoValor =
-        estado
-            ? estado.value
-            : "";
-
-
-    const vencimientoValor =
-        vencimiento
-            ? vencimiento.value
-            : "";
-
-
-    // ----------------------------------------------
-    // VALIDAR ID
-    // ----------------------------------------------
 
     if (!id) {
 
@@ -1163,54 +1198,7 @@ function guardarCliente() {
     }
 
 
-    // ----------------------------------------------
-    // VALIDAR ID DUPLICADO
-    // ----------------------------------------------
-
-    const existe =
-        clientes.some(
-            cliente =>
-                cliente.id === id
-                &&
-                cliente.id !== clienteEditando
-        );
-
-
-    if (existe) {
-
-        mostrarToast(
-            "Ese ID ya existe."
-        );
-
-        return;
-
-    }
-
-
-    // ----------------------------------------------
-    // VALIDAR ESTADO
-    // ----------------------------------------------
-
-    if (
-        estadoValor !== "ACTIVA"
-        &&
-        estadoValor !== "SUSPENDIDA"
-    ) {
-
-        mostrarToast(
-            "Seleccioná un estado válido."
-        );
-
-        return;
-
-    }
-
-
-    // ----------------------------------------------
-    // VALIDAR FECHA
-    // ----------------------------------------------
-
-    if (!vencimientoValor) {
+    if (!vencimiento) {
 
         mostrarToast(
             "Ingresá una fecha de vencimiento."
@@ -1221,75 +1209,160 @@ function guardarCliente() {
     }
 
 
-    // ----------------------------------------------
-    // ACTUALIZAR CLIENTE
-    // ----------------------------------------------
-
-    if (clienteEditando) {
-
-        const indice =
-            clientes.findIndex(
-                cliente =>
-                    cliente.id === clienteEditando
-            );
+    const existe =
+        clientes.some(
+            cliente =>
+                cliente.id === id
+                &&
+                cliente.id !==
+                clienteEditando
+        );
 
 
-        if (indice !== -1) {
+    if (
+        existe &&
+        !clienteEditando
+    ) {
 
-            clientes[indice] = {
+        mostrarToast(
+            "Ese ID ya existe."
+        );
 
-                id:
-                    clienteEditando,
+        return;
 
-                estado:
-                    estadoValor,
+    }
 
-                vencimiento:
-                    vencimientoValor
 
-            };
+    const boton =
+        document.getElementById(
+            "btnGuardarCliente"
+        );
+
+
+    boton.disabled =
+        true;
+
+
+    boton.textContent =
+        "Guardando...";
+
+
+    try {
+
+        let respuesta;
+
+
+        // ==========================================
+        // MODIFICAR
+        // ==========================================
+
+        if (clienteEditando) {
+
+            respuesta =
+                await peticionAutorizada(
+                    API_URL +
+                    "/clientes/" +
+                    encodeURIComponent(
+                        clienteEditando
+                    ),
+                    {
+
+                        method:
+                            "PUT",
+
+                        body:
+                            JSON.stringify({
+
+                                estado:
+                                    estado,
+
+                                vencimiento:
+                                    vencimiento
+
+                            })
+
+                    }
+                );
+
+        }
+
+        // ==========================================
+        // CREAR
+        // ==========================================
+
+        else {
+
+            respuesta =
+                await peticionAutorizada(
+                    API_URL +
+                    "/clientes",
+                    {
+
+                        method:
+                            "POST",
+
+                        body:
+                            JSON.stringify({
+
+                                id:
+                                    id,
+
+                                estado:
+                                    estado,
+
+                                vencimiento:
+                                    vencimiento
+
+                            })
+
+                    }
+                );
 
         }
 
 
-        mostrarToast(
-            "Cliente modificado localmente."
-        );
+        const datos =
+            await respuesta.json();
 
-    }
 
-    // ----------------------------------------------
-    // NUEVO CLIENTE
-    // ----------------------------------------------
+        if (!respuesta.ok) {
 
-    else {
+            throw new Error(
+                datos.error ||
+                "No se pudo guardar."
+            );
 
-        clientes.push({
+        }
 
-            id:
-                id,
 
-            estado:
-                estadoValor,
-
-            vencimiento:
-                vencimientoValor
-
-        });
+        cerrarModalCliente();
 
 
         mostrarToast(
-            "Cliente creado localmente."
+            datos.mensaje ||
+            "Guardado correctamente."
         );
 
+
+        await cargarClientes();
+
+
+    } catch (error) {
+
+        manejarError(
+            error
+        );
+
+
+    } finally {
+
+        boton.disabled =
+            false;
+
+        boton.textContent =
+            "Guardar cliente";
+
     }
-
-
-    actualizarDashboard();
-
-    aplicarFiltros();
-
-    cerrarModalCliente();
 
 }
 
@@ -1337,7 +1410,7 @@ function abrirModalEliminar(
 // CONFIRMAR ELIMINACIÓN
 // ==================================================
 
-function confirmarEliminar() {
+async function confirmarEliminar() {
 
     if (!clienteEliminar) {
 
@@ -1346,33 +1419,90 @@ function confirmarEliminar() {
     }
 
 
-    clientes =
-        clientes.filter(
-            cliente =>
-                cliente.id !== clienteEliminar
+    const id =
+        clienteEliminar;
+
+
+    const boton =
+        document.getElementById(
+            "btnConfirmarEliminar"
         );
 
 
-    mostrarToast(
-        "Cliente eliminado localmente."
-    );
+    boton.disabled =
+        true;
 
 
-    clienteEliminar =
-        null;
+    boton.textContent =
+        "Eliminando...";
 
 
-    actualizarDashboard();
+    try {
 
-    aplicarFiltros();
+        const respuesta =
+            await peticionAutorizada(
+                API_URL +
+                "/clientes/" +
+                encodeURIComponent(
+                    id
+                ),
+                {
 
-    cerrarModalEliminar();
+                    method:
+                        "DELETE"
+
+                }
+            );
+
+
+        const datos =
+            await respuesta.json();
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                datos.error ||
+                "No se pudo eliminar."
+            );
+
+        }
+
+
+        cerrarModalEliminar();
+
+
+        mostrarToast(
+            datos.mensaje ||
+            "Cliente eliminado."
+        );
+
+
+        await cargarClientes();
+
+
+    } catch (error) {
+
+        manejarError(
+            error
+        );
+
+
+    } finally {
+
+        boton.disabled =
+            false;
+
+        boton.textContent =
+            "Eliminar";
+
+    }
 
 }
 
 
 // ==================================================
-// MODAL CLIENTE
+// MODALES
 // ==================================================
 
 function mostrarModal(
@@ -1402,10 +1532,6 @@ function mostrarModal(
 }
 
 
-// ==================================================
-// CERRAR MODAL CLIENTE
-// ==================================================
-
 function cerrarModalCliente() {
 
     const modal =
@@ -1422,15 +1548,15 @@ function cerrarModalCliente() {
     }
 
 
+    clienteEditando =
+        null;
+
+
     document.body.style.overflow =
         "";
 
 }
 
-
-// ==================================================
-// CERRAR MODAL ELIMINAR
-// ==================================================
 
 function cerrarModalEliminar() {
 
@@ -1454,6 +1580,133 @@ function cerrarModalEliminar() {
 
     document.body.style.overflow =
         "";
+
+}
+
+
+// ==================================================
+// ERRORES
+// ==================================================
+
+function manejarError(
+    error
+) {
+
+    console.error(
+        error
+    );
+
+
+    if (
+        error.message ===
+        "ADMIN_KEY_REQUIRED"
+    ) {
+
+        mostrarToast(
+            "Operación cancelada."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        error.message ===
+        "ADMIN_KEY_INVALID"
+    ) {
+
+        mostrarToast(
+            "Clave de administración incorrecta."
+        );
+
+        return;
+
+    }
+
+
+    mostrarToast(
+        error.message ||
+        "Ocurrió un error."
+    );
+
+}
+
+
+// ==================================================
+// ERROR DE CARGA
+// ==================================================
+
+function mostrarErrorCarga() {
+
+    const tabla =
+        document.getElementById(
+            "tablaClientes"
+        );
+
+
+    if (!tabla) {
+
+        return;
+
+    }
+
+
+    tabla.innerHTML = "";
+
+
+    const fila =
+        document.createElement(
+            "tr"
+        );
+
+
+    fila.className =
+        "empty-row";
+
+
+    const celda =
+        document.createElement(
+            "td"
+        );
+
+
+    celda.colSpan = 5;
+
+
+    celda.textContent =
+        "No se pudieron cargar las licencias.";
+
+
+    fila.appendChild(
+        celda
+    );
+
+
+    tabla.appendChild(
+        fila
+    );
+
+
+    establecerTexto(
+        "totalClientes",
+        "—"
+    );
+
+    establecerTexto(
+        "clientesActivos",
+        "—"
+    );
+
+    establecerTexto(
+        "clientesSuspendidos",
+        "—"
+    );
+
+    establecerTexto(
+        "clientesVencidos",
+        "—"
+    );
 
 }
 
@@ -1506,92 +1759,14 @@ function mostrarToast(
                     true;
 
             },
-            3000
+            3500
         );
 
 }
 
 
 // ==================================================
-// ERROR DE CARGA
-// ==================================================
-
-function mostrarErrorCarga() {
-
-    const tabla =
-        document.getElementById(
-            "tablaClientes"
-        );
-
-
-    if (!tabla) {
-
-        return;
-
-    }
-
-
-    tabla.innerHTML = "";
-
-
-    const fila =
-        document.createElement("tr");
-
-
-    fila.className =
-        "empty-row";
-
-
-    const celda =
-        document.createElement("td");
-
-
-    celda.colSpan =
-        5;
-
-
-    celda.textContent =
-        "No se pudo cargar clientes.json.";
-
-
-    fila.appendChild(
-        celda
-    );
-
-
-    tabla.appendChild(
-        fila
-    );
-
-
-    establecerTexto(
-        "totalClientes",
-        "—"
-    );
-
-
-    establecerTexto(
-        "clientesActivos",
-        "—"
-    );
-
-
-    establecerTexto(
-        "clientesSuspendidos",
-        "—"
-    );
-
-
-    establecerTexto(
-        "clientesVencidos",
-        "—"
-    );
-
-}
-
-
-// ==================================================
-// UTILIDAD TEXTO
+// UTILIDAD
 // ==================================================
 
 function establecerTexto(
