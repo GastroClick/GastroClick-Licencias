@@ -7,9 +7,6 @@
 const API_URL =
     "https://gastroclick-licencias-api.adm-gastroclick.workers.dev";
 
-const STORAGE_KEY =
-    "gastroclick_admin_key";
-
 
 // ==================================================
 // VARIABLES
@@ -30,109 +27,1030 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        crearPantallaLogin();
+
         inicializarEventos();
 
-        cargarClientes();
+        comprobarSesion();
 
     }
 );
 
 
 // ==================================================
-// EVENTOS
-// ==================================================
-// ==================================================
-// GENERADOR DE ID
+// LOGIN
 // ==================================================
 
-function generarIdCliente() {
+function crearPantallaLogin() {
 
-    const caracteres =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    // Evitar duplicados
+    if (
+        document.getElementById(
+            "pantallaLogin"
+        )
+    ) {
 
-
-    function generarBloque() {
-
-        const valores =
-            new Uint32Array(4);
-
-        crypto.getRandomValues(
-            valores
-        );
-
-        let resultado = "";
-
-        for (
-            let i = 0;
-            i < 4;
-            i++
-        ) {
-
-            resultado +=
-                caracteres[
-                    valores[i] %
-                    caracteres.length
-                ];
-
-        }
-
-        return resultado;
+        return;
 
     }
 
 
-    return (
-        "GC-" +
-        generarBloque() +
-        "-" +
-        generarBloque() +
-        "-" +
-        generarBloque()
+    const login =
+        document.createElement(
+            "div"
+        );
+
+
+    login.id =
+        "pantallaLogin";
+
+
+    login.innerHTML = `
+
+        <div class="login-container">
+
+            <div class="login-card">
+
+                <div class="login-logo">
+                    GastroClick
+                </div>
+
+                <div class="login-subtitle">
+                    Administración
+                </div>
+
+
+                <div class="login-title">
+                    Iniciar sesión
+                </div>
+
+                <div class="login-description">
+                    Acceso al panel de administración
+                </div>
+
+
+                <form id="formLogin">
+
+                    <div class="login-group">
+
+                        <label for="loginUsuario">
+                            Usuario
+                        </label>
+
+                        <input
+                            type="text"
+                            id="loginUsuario"
+                            autocomplete="username"
+                            placeholder="Usuario"
+                            required>
+
+                    </div>
+
+
+                    <div class="login-group">
+
+                        <label for="loginPassword">
+                            Contraseña
+                        </label>
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            autocomplete="current-password"
+                            placeholder="Contraseña"
+                            required>
+
+                    </div>
+
+
+                    <div
+                        id="loginError"
+                        class="login-error"
+                        hidden>
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="btnLogin"
+                        class="login-button">
+
+                        Iniciar sesión
+
+                    </button>
+
+                </form>
+
+
+                <div class="login-footer">
+                    Sistema de licencias GastroClick
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.prepend(
+        login
+    );
+
+
+    agregarEstilosLogin();
+
+
+    document
+        .getElementById(
+            "formLogin"
+        )
+        ?.addEventListener(
+            "submit",
+            iniciarSesion
+        );
+
+}
+
+
+// ==================================================
+// ESTILOS LOGIN
+// ==================================================
+
+function agregarEstilosLogin() {
+
+    if (
+        document.getElementById(
+            "gastroclickLoginStyles"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const style =
+        document.createElement(
+            "style"
+        );
+
+
+    style.id =
+        "gastroclickLoginStyles";
+
+
+    style.textContent = `
+
+        #pantallaLogin {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 99999;
+
+            background:
+                #f5f7fb;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+        }
+
+
+        .login-container {
+
+            width: 100%;
+
+            max-width: 420px;
+
+        }
+
+
+        .login-card {
+
+            background: #ffffff;
+
+            border-radius: 18px;
+
+            padding: 40px;
+
+            box-shadow:
+                0 20px 50px
+                rgba(0,0,0,.10);
+
+            border:
+                1px solid #e5e7eb;
+
+        }
+
+
+        .login-logo {
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            text-align: center;
+
+            color: #111827;
+
+        }
+
+
+        .login-subtitle {
+
+            text-align: center;
+
+            color: #6b7280;
+
+            margin-top: 4px;
+
+            font-size: 14px;
+
+        }
+
+
+        .login-title {
+
+            margin-top: 35px;
+
+            font-size: 24px;
+
+            font-weight: 700;
+
+            color: #111827;
+
+        }
+
+
+        .login-description {
+
+            margin-top: 6px;
+
+            margin-bottom: 28px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+        }
+
+
+        .login-group {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .login-group label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #374151;
+
+        }
+
+
+        .login-group input {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
+            outline: none;
+
+        }
+
+
+        .login-group input:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37,99,235,.10);
+
+        }
+
+
+        .login-button {
+
+            width: 100%;
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 14px;
+
+            background: #111827;
+
+            color: #ffffff;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+        }
+
+
+        .login-button:hover {
+
+            background: #1f2937;
+
+        }
+
+
+        .login-button:disabled {
+
+            opacity: .6;
+
+            cursor: wait;
+
+        }
+
+
+        .login-error {
+
+            background: #fef2f2;
+
+            color: #b91c1c;
+
+            border:
+                1px solid #fecaca;
+
+            padding: 11px 12px;
+
+            border-radius: 8px;
+
+            margin-bottom: 16px;
+
+            font-size: 14px;
+
+        }
+
+
+        .login-footer {
+
+            margin-top: 28px;
+
+            text-align: center;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+
+        }
+
+
+        #btnCerrarSesion {
+
+            margin-left: 15px;
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
     );
 
 }
 
 
 // ==================================================
-// GENERAR ID ÚNICO
+// COMPROBAR SESIÓN
 // ==================================================
 
-function generarIdClienteUnico() {
+async function comprobarSesion() {
 
-    let intentos = 0;
-
-    while (
-        intentos < 100
-    ) {
-
-        const nuevoId =
-            generarIdCliente();
+    ocultarPanel();
 
 
-        const existe =
-            clientes.some(
-                cliente =>
-                    cliente.id === nuevoId
+    try {
+
+        const respuesta =
+            await fetch(
+
+                API_URL +
+                "/session?t=" +
+                Date.now(),
+
+                {
+
+                    method:
+                        "GET",
+
+                    credentials:
+                        "include",
+
+                    cache:
+                        "no-store"
+
+                }
+
             );
 
 
-        if (!existe) {
+        if (
+            !respuesta.ok
+        ) {
 
-            return nuevoId;
+            mostrarLogin();
+
+            return;
 
         }
 
 
-        intentos++;
+        const datos =
+            await respuesta.json();
+
+
+        if (
+            datos.autenticado
+        ) {
+
+            mostrarPanel();
+
+            cargarClientes();
+
+        } else {
+
+            mostrarLogin();
+
+        }
+
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Error comprobando sesión:",
+            error
+        );
+
+
+        mostrarLogin();
+
+    }
+
+}
+
+
+// ==================================================
+// INICIAR SESIÓN
+// ==================================================
+
+async function iniciarSesion(
+    event
+) {
+
+    event.preventDefault();
+
+
+    const usuario =
+        document.getElementById(
+            "loginUsuario"
+        )?.value.trim();
+
+
+    const password =
+        document.getElementById(
+            "loginPassword"
+        )?.value;
+
+
+    const boton =
+        document.getElementById(
+            "btnLogin"
+        );
+
+
+    const errorElemento =
+        document.getElementById(
+            "loginError"
+        );
+
+
+    if (
+        !usuario ||
+        !password
+    ) {
+
+        mostrarErrorLogin(
+            "Ingresá usuario y contraseña."
+        );
+
+        return;
 
     }
 
 
-    throw new Error(
-        "No se pudo generar un ID único."
+    if (boton) {
+
+        boton.disabled =
+            true;
+
+        boton.textContent =
+            "Ingresando...";
+
+    }
+
+
+    ocultarErrorLogin();
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+
+                API_URL +
+                "/login",
+
+                {
+
+                    method:
+                        "POST",
+
+                    credentials:
+                        "include",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            usuario:
+                                usuario,
+
+                            password:
+                                password
+
+                        })
+
+                }
+
+            );
+
+
+        const datos =
+            await respuesta.json();
+
+
+        if (
+            !respuesta.ok
+        ) {
+
+            throw new Error(
+
+                datos.error ||
+                "Usuario o contraseña incorrectos."
+
+            );
+
+        }
+
+
+        // ==========================================
+        // LOGIN CORRECTO
+        // ==========================================
+
+        document.getElementById(
+            "loginUsuario"
+        ).value = "";
+
+
+        document.getElementById(
+            "loginPassword"
+        ).value = "";
+
+
+        mostrarPanel();
+
+
+        cargarClientes();
+
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Error de login:",
+            error
+        );
+
+
+        mostrarErrorLogin(
+
+            error.message ||
+            "No se pudo iniciar sesión."
+
+        );
+
+    } finally {
+
+        if (boton) {
+
+            boton.disabled =
+                false;
+
+            boton.textContent =
+                "Iniciar sesión";
+
+        }
+
+    }
+
+}
+
+
+// ==================================================
+// CERRAR SESIÓN
+// ==================================================
+
+async function cerrarSesion() {
+
+    try {
+
+        await fetch(
+
+            API_URL +
+            "/logout",
+
+            {
+
+                method:
+                    "POST",
+
+                credentials:
+                    "include",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                }
+
+            }
+
+        );
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Error cerrando sesión:",
+            error
+        );
+
+    }
+
+
+    clientes = [];
+
+    clienteEditando =
+        null;
+
+    clienteEliminar =
+        null;
+
+
+    ocultarPanel();
+
+    mostrarLogin();
+
+}
+
+
+// ==================================================
+// MOSTRAR LOGIN
+// ==================================================
+
+function mostrarLogin() {
+
+    const login =
+        document.getElementById(
+            "pantallaLogin"
+        );
+
+
+    if (login) {
+
+        login.style.display =
+            "flex";
+
+    }
+
+
+    const usuario =
+        document.getElementById(
+            "loginUsuario"
+        );
+
+
+    if (usuario) {
+
+        setTimeout(
+            () => usuario.focus(),
+            100
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// OCULTAR LOGIN
+// ==================================================
+
+function ocultarLogin() {
+
+    const login =
+        document.getElementById(
+            "pantallaLogin"
+        );
+
+
+    if (login) {
+
+        login.style.display =
+            "none";
+
+    }
+
+}
+
+
+// ==================================================
+// MOSTRAR PANEL
+// ==================================================
+
+function mostrarPanel() {
+
+    ocultarLogin();
+
+
+    const sidebar =
+        document.querySelector(
+            ".sidebar"
+        );
+
+
+    const main =
+        document.querySelector(
+            ".main-content"
+        );
+
+
+    if (sidebar) {
+
+        sidebar.style.display =
+            "";
+
+    }
+
+
+    if (main) {
+
+        main.style.display =
+            "";
+
+    }
+
+
+    agregarBotonCerrarSesion();
+
+}
+
+
+// ==================================================
+// OCULTAR PANEL
+// ==================================================
+
+function ocultarPanel() {
+
+    const sidebar =
+        document.querySelector(
+            ".sidebar"
+        );
+
+
+    const main =
+        document.querySelector(
+            ".main-content"
+        );
+
+
+    if (sidebar) {
+
+        sidebar.style.display =
+            "none";
+
+    }
+
+
+    if (main) {
+
+        main.style.display =
+            "none";
+
+    }
+
+}
+
+
+// ==================================================
+// BOTÓN CERRAR SESIÓN
+// ==================================================
+
+function agregarBotonCerrarSesion() {
+
+    if (
+        document.getElementById(
+            "btnCerrarSesion"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const topbar =
+        document.querySelector(
+            ".topbar"
+        );
+
+
+    if (!topbar) {
+
+        return;
+
+    }
+
+
+    const estado =
+        topbar.querySelector(
+            ".connection-status"
+        );
+
+
+    if (!estado) {
+
+        return;
+
+    }
+
+
+    const boton =
+        document.createElement(
+            "button"
+        );
+
+
+    boton.id =
+        "btnCerrarSesion";
+
+
+    boton.type =
+        "button";
+
+
+    boton.textContent =
+        "Cerrar sesión";
+
+
+    boton.style.border =
+        "1px solid #d1d5db";
+
+
+    boton.style.background =
+        "#ffffff";
+
+
+    boton.style.color =
+        "#374151";
+
+
+    boton.style.borderRadius =
+        "8px";
+
+
+    boton.style.padding =
+        "8px 12px";
+
+
+    boton.style.cursor =
+        "pointer";
+
+
+    boton.addEventListener(
+        "click",
+        cerrarSesion
+    );
+
+
+    estado.appendChild(
+        boton
     );
 
 }
+
+
+// ==================================================
+// ERROR LOGIN
+// ==================================================
+
+function mostrarErrorLogin(
+    mensaje
+) {
+
+    const elemento =
+        document.getElementById(
+            "loginError"
+        );
+
+
+    if (!elemento) {
+
+        return;
+
+    }
+
+
+    elemento.textContent =
+        mensaje;
+
+
+    elemento.hidden =
+        false;
+
+}
+
+
+function ocultarErrorLogin() {
+
+    const elemento =
+        document.getElementById(
+            "loginError"
+        );
+
+
+    if (elemento) {
+
+        elemento.hidden =
+            true;
+
+        elemento.textContent =
+            "";
+
+    }
+
+}
+
+
+// ==================================================
+// EVENTOS
+// ==================================================
+
 function inicializarEventos() {
 
     document
@@ -248,56 +1166,6 @@ function inicializarEventos() {
 
 
 // ==================================================
-// OBTENER ADMIN KEY
-// ==================================================
-
-function obtenerAdminKey() {
-
-    let key =
-        sessionStorage.getItem(
-            STORAGE_KEY
-        );
-
-
-    if (key) {
-
-        return key;
-
-    }
-
-
-    key =
-        window.prompt(
-            "Ingrese la clave de administración:"
-        );
-
-
-    if (
-        !key ||
-        !key.trim()
-    ) {
-
-        return null;
-
-    }
-
-
-    key =
-        key.trim();
-
-
-    sessionStorage.setItem(
-        STORAGE_KEY,
-        key
-    );
-
-
-    return key;
-
-}
-
-
-// ==================================================
 // PETICIÓN AUTORIZADA
 // ==================================================
 
@@ -306,25 +1174,9 @@ async function peticionAutorizada(
     opciones = {}
 ) {
 
-    const adminKey =
-        obtenerAdminKey();
-
-
-    if (!adminKey) {
-
-        throw new Error(
-            "ADMIN_KEY_REQUIRED"
-        );
-
-    }
-
-
     const headers = {
 
         ...(opciones.headers || {}),
-
-        "Authorization":
-            "Bearer " + adminKey,
 
         "Content-Type":
             "application/json"
@@ -334,25 +1186,45 @@ async function peticionAutorizada(
 
     const respuesta =
         await fetch(
+
             url,
+
             {
+
                 ...opciones,
-                headers
+
+                headers,
+
+                credentials:
+                    "include"
+
             }
+
         );
 
 
+    // ==============================================
+    // SESIÓN EXPIRADA
+    // ==============================================
+
     if (
-        respuesta.status === 401
+        respuesta.status ===
+        401
     ) {
 
-        sessionStorage.removeItem(
-            STORAGE_KEY
+        clientes = [];
+
+        ocultarPanel();
+
+        mostrarLogin();
+
+        mostrarErrorLogin(
+            "La sesión expiró. Volvé a iniciar sesión."
         );
 
 
         throw new Error(
-            "ADMIN_KEY_INVALID"
+            "SESSION_EXPIRED"
         );
 
     }
@@ -372,13 +1244,22 @@ async function cargarClientes() {
     try {
 
         const respuesta =
-            await fetch(
+            await peticionAutorizada(
+
                 API_URL +
                 "/clientes?t=" +
                 Date.now(),
+
                 {
-                    cache: "no-store"
+
+                    method:
+                        "GET",
+
+                    cache:
+                        "no-store"
+
                 }
+
             );
 
 
@@ -439,13 +1320,24 @@ async function cargarClientes() {
 
         aplicarFiltros();
 
-
         establecerConexion(
             true
         );
 
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
+
+        if (
+            error.message ===
+            "SESSION_EXPIRED"
+        ) {
+
+            return;
+
+        }
+
 
         console.error(
             "Error:",
@@ -683,6 +1575,7 @@ function renderizarClientes(
                 "tr"
             );
 
+
         fila.className =
             "empty-row";
 
@@ -692,7 +1585,10 @@ function renderizarClientes(
                 "td"
             );
 
-        celda.colSpan = 5;
+
+        celda.colSpan =
+            5;
+
 
         celda.textContent =
             "No se encontraron clientes.";
@@ -702,9 +1598,11 @@ function renderizarClientes(
             celda
         );
 
+
         tabla.appendChild(
             fila
         );
+
 
         return;
 
@@ -720,25 +1618,23 @@ function renderizarClientes(
                 );
 
 
-            // ======================================
             // ID
-            // ======================================
 
             const celdaId =
                 document.createElement(
                     "td"
                 );
 
+
             celdaId.className =
                 "client-id";
+
 
             celdaId.textContent =
                 cliente.id;
 
 
-            // ======================================
             // ESTADO
-            // ======================================
 
             const celdaEstado =
                 document.createElement(
@@ -771,9 +1667,7 @@ function renderizarClientes(
             );
 
 
-            // ======================================
             // VENCIMIENTO
-            // ======================================
 
             const celdaVencimiento =
                 document.createElement(
@@ -787,9 +1681,7 @@ function renderizarClientes(
                 );
 
 
-            // ======================================
             // SITUACIÓN
-            // ======================================
 
             const celdaSituacion =
                 document.createElement(
@@ -823,9 +1715,7 @@ function renderizarClientes(
             );
 
 
-            // ======================================
             // ACCIONES
-            // ======================================
 
             const celdaAcciones =
                 document.createElement(
@@ -852,8 +1742,10 @@ function renderizarClientes(
             btnEditar.type =
                 "button";
 
+
             btnEditar.className =
                 "action-btn";
+
 
             btnEditar.textContent =
                 "Editar";
@@ -877,8 +1769,10 @@ function renderizarClientes(
             btnEliminar.type =
                 "button";
 
+
             btnEliminar.className =
                 "action-btn delete";
+
 
             btnEliminar.textContent =
                 "Eliminar";
@@ -897,6 +1791,7 @@ function renderizarClientes(
                 btnEditar
             );
 
+
             acciones.appendChild(
                 btnEliminar
             );
@@ -911,17 +1806,21 @@ function renderizarClientes(
                 celdaId
             );
 
+
             fila.appendChild(
                 celdaEstado
             );
+
 
             fila.appendChild(
                 celdaVencimiento
             );
 
+
             fila.appendChild(
                 celdaSituacion
             );
+
 
             fila.appendChild(
                 celdaAcciones
@@ -1067,9 +1966,19 @@ function convertirFecha(
 
     const resultado =
         new Date(
-            Number(partes[0]),
-            Number(partes[1]) - 1,
-            Number(partes[2])
+
+            Number(
+                partes[0]
+            ),
+
+            Number(
+                partes[1]
+            ) - 1,
+
+            Number(
+                partes[2]
+            )
+
         );
 
 
@@ -1111,11 +2020,13 @@ function formatearFecha(
 
 
     return (
+
         partes[2] +
         "/" +
         partes[1] +
         "/" +
         partes[0]
+
     );
 
 }
@@ -1166,12 +2077,14 @@ function generarIdCliente() {
 
 
     return (
+
         "GC-" +
         generarBloque() +
         "-" +
         generarBloque() +
         "-" +
         generarBloque()
+
     );
 
 }
@@ -1255,26 +2168,27 @@ function abrirModalNuevoCliente() {
         );
 
 
-    // ==============================================
-    // GENERAR ID AUTOMÁTICAMENTE
-    // ==============================================
-
     let nuevoId;
+
 
     try {
 
         nuevoId =
             generarIdClienteUnico();
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
 
         console.error(
             error
         );
 
+
         mostrarToast(
             "No se pudo generar el ID del cliente."
         );
+
 
         return;
 
@@ -1286,8 +2200,10 @@ function abrirModalNuevoCliente() {
         id.value =
             nuevoId;
 
+
         id.disabled =
             true;
+
 
         id.readOnly =
             true;
@@ -1338,6 +2254,7 @@ function abrirModalEditarCliente(
         mostrarToast(
             "Cliente no encontrado."
         );
+
 
         return;
 
@@ -1429,6 +2346,7 @@ async function guardarCliente() {
             "No se pudo generar el ID del cliente."
         );
 
+
         return;
 
     }
@@ -1440,22 +2358,18 @@ async function guardarCliente() {
             "Ingresá una fecha de vencimiento."
         );
 
+
         return;
 
     }
 
 
-    // ==========================================
-    // COMPROBAR ID DUPLICADO
-    // ==========================================
-
     const existe =
         clientes.some(
             cliente =>
-                cliente.id === id
-                &&
+                cliente.id === id &&
                 cliente.id !==
-                clienteEditando
+                    clienteEditando
         );
 
 
@@ -1463,12 +2377,6 @@ async function guardarCliente() {
         existe &&
         !clienteEditando
     ) {
-
-        /*
-         * Es extremadamente improbable porque
-         * usamos crypto.getRandomValues(),
-         * pero si ocurre generamos otro ID.
-         */
 
         const nuevoId =
             generarIdClienteUnico();
@@ -1521,11 +2429,13 @@ async function guardarCliente() {
 
             respuesta =
                 await peticionAutorizada(
+
                     API_URL +
                     "/clientes/" +
                     encodeURIComponent(
                         clienteEditando
                     ),
+
                     {
 
                         method:
@@ -1543,6 +2453,7 @@ async function guardarCliente() {
                             })
 
                     }
+
                 );
 
         }
@@ -1555,8 +2466,10 @@ async function guardarCliente() {
 
             respuesta =
                 await peticionAutorizada(
+
                     API_URL +
                     "/clientes",
+
                     {
 
                         method:
@@ -1577,6 +2490,7 @@ async function guardarCliente() {
                             })
 
                     }
+
                 );
 
         }
@@ -1589,8 +2503,10 @@ async function guardarCliente() {
         if (!respuesta.ok) {
 
             throw new Error(
+
                 datos.error ||
                 "No se pudo guardar."
+
             );
 
         }
@@ -1600,15 +2516,29 @@ async function guardarCliente() {
 
 
         mostrarToast(
+
             datos.mensaje ||
             "Guardado correctamente."
+
         );
 
 
         await cargarClientes();
 
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
+
+        if (
+            error.message ===
+            "SESSION_EXPIRED"
+        ) {
+
+            return;
+
+        }
+
 
         manejarError(
             error
@@ -1619,6 +2549,7 @@ async function guardarCliente() {
 
         boton.disabled =
             false;
+
 
         boton.textContent =
             "Guardar cliente";
@@ -1702,17 +2633,20 @@ async function confirmarEliminar() {
 
         const respuesta =
             await peticionAutorizada(
+
                 API_URL +
                 "/clientes/" +
                 encodeURIComponent(
                     id
                 ),
+
                 {
 
                     method:
                         "DELETE"
 
                 }
+
             );
 
 
@@ -1723,8 +2657,10 @@ async function confirmarEliminar() {
         if (!respuesta.ok) {
 
             throw new Error(
+
                 datos.error ||
                 "No se pudo eliminar."
+
             );
 
         }
@@ -1734,15 +2670,29 @@ async function confirmarEliminar() {
 
 
         mostrarToast(
+
             datos.mensaje ||
             "Cliente eliminado."
+
         );
 
 
         await cargarClientes();
 
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
+
+        if (
+            error.message ===
+            "SESSION_EXPIRED"
+        ) {
+
+            return;
+
+        }
+
 
         manejarError(
             error
@@ -1753,6 +2703,7 @@ async function confirmarEliminar() {
 
         boton.disabled =
             false;
+
 
         boton.textContent =
             "Eliminar";
@@ -1860,26 +2811,8 @@ function manejarError(
 
     if (
         error.message ===
-        "ADMIN_KEY_REQUIRED"
+        "SESSION_EXPIRED"
     ) {
-
-        mostrarToast(
-            "Operación cancelada."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        error.message ===
-        "ADMIN_KEY_INVALID"
-    ) {
-
-        mostrarToast(
-            "Clave de administración incorrecta."
-        );
 
         return;
 
@@ -1887,8 +2820,10 @@ function manejarError(
 
 
     mostrarToast(
+
         error.message ||
         "Ocurrió un error."
+
     );
 
 }
@@ -1932,7 +2867,8 @@ function mostrarErrorCarga() {
         );
 
 
-    celda.colSpan = 5;
+    celda.colSpan =
+        5;
 
 
     celda.textContent =
@@ -2017,13 +2953,16 @@ function mostrarToast(
 
     mostrarToast.timeout =
         setTimeout(
+
             () => {
 
                 toast.hidden =
                     true;
 
             },
+
             3500
+
         );
 
 }
