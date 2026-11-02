@@ -19,6 +19,11 @@
       "id": "GC-CO2P-4YBK-KEO9",
       "estado": "ACTIVA",
       "vencimiento": "2026-11-30"
+    },
+    {
+      "id": "GC-IQ2C-9KZM-4ZHH",
+      "estado": "ACTIVA",
+      "vencimiento": "2026-12-31"
     }
   ]
 }
